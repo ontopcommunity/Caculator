@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Máy Tính Siêu Cấp</title>
+<title>Máy Tính</title>
 <style>
 :root {
     --popup-bg-color: #ffffff;
@@ -12,7 +12,6 @@
     --popup-border-radius: 12px;
     --popup-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
-/* Sửa lại body để luôn chiếm trọn 100% màn hình */
 body {
     background-color: #0b1120;
     color: white;
@@ -26,7 +25,6 @@ body {
     align-items: center;
     overflow: hidden;
 }
-/* Wrapper bọc lấy toàn bộ và canh giữa tuyệt đối */
 #calc-wrapper {
     position: absolute;
     top: 0;
@@ -83,7 +81,6 @@ body {
 }
 .text-red { color: #f87171; }
 .text-green { color: #34d399; }
-
 .calc-footer {
     display: flex;
     justify-content: space-between;
@@ -114,7 +111,6 @@ body {
     background: #ef4444;
     color: #0b1120;
 }
-
 .menu-panel {
     position: absolute;
     bottom: 80px;
@@ -159,7 +155,6 @@ body {
     color: #0b1120;
     box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
 }
-
 #popup-notification-container {
     position: fixed;
     top: 20px;
@@ -306,21 +301,15 @@ body {
 function updateCalcScale() {
     const calc = document.getElementById('calc-container');
     if (!calc) return;
-    
-    // Đã chuyển sang lấy kích thước trực tiếp từ window để đảm bảo độ chính xác 100%
     const baseWidth = 360; 
     const baseHeight = 620; 
     const availableWidth = window.innerWidth;
     const availableHeight = window.innerHeight;
-    
-    // Trừ hao 5% để không sát viền quá
     const scale = Math.min(availableWidth / baseWidth, availableHeight / baseHeight) * 0.95;
-    
     calc.style.transform = `scale(${Math.max(0.3, scale)})`;
 }
 
 window.addEventListener('resize', updateCalcScale);
-// Đảm bảo chạy lại lúc tải xong trang
 document.addEventListener('DOMContentLoaded', updateCalcScale);
 window.onload = updateCalcScale;
 
@@ -345,23 +334,18 @@ let jumping = true;
 let missing = true;
 
 const pkgs = [
-    { id: 'pkg-noads', time: 60 },
+    { id: 'pkg-noads', time: 30 },
     { id: 'pkg-acc', time: 60 },
-    { id: 'pkg-nomiss', time: 60 },
-    { id: 'pkg-nojump', time: 60 },
-    { id: 'pkg-combo', time: 180 }
+    { id: 'pkg-nomiss', time: 90 },
+    { id: 'pkg-nojump', time: 120 },
+    { id: 'pkg-combo', time: 150 }
 ];
 
-const shuffled = pkgs.sort(() => 0.5 - Math.random());
-const selected = shuffled.slice(0, 2);
-
-selected.forEach(pkg => {
+pkgs.forEach(pkg => {
     const btn = document.getElementById(pkg.id);
     const name = btn.getAttribute('data-name');
     let timeLeft = pkg.time;
-    
     btn.innerText = `${timeLeft}s`;
-    
     const timerInterval = setInterval(() => {
         timeLeft--;
         if (timeLeft <= 0) {
@@ -463,7 +447,6 @@ buttons.forEach(btn => {
             window.location.href = "https://youtu.be/dQw4w9WgXcQ";
             return; 
         }
-
         randomize();
         let val = btn.dataset.val;
         if (val === 'C') {
@@ -484,45 +467,37 @@ buttons.forEach(btn => {
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('popup-notification-container');
     const template = document.getElementById('popup-template');
+    
     const adData = [
-        {
-            icon: 'https://via.placeholder.com/40',
-            title: 'Khuyến mãi đặc biệt!',
-            description: 'Giảm giá lên đến 50% cho tất cả các mặt hàng gia dụng. Đừng bỏ lỡ!',
-            link: '#'
-        },
-        {
-            icon: 'https://via.placeholder.com/40/e0e0e0',
-            title: 'Tải ngay ứng dụng mới!',
-            description: 'Trải nghiệm mua sắm mượt mà hơn với ứng dụng mới của chúng tôi.',
-            link: '#'
-        },
-        {
-            icon: 'https://via.placeholder.com/40/c0c0c0',
-            title: 'Khóa học trực tuyến miễn phí',
-            description: 'Đăng ký ngay để nhận khóa học lập trình cơ bản miễn phí.',
-            link: '#'
-        }
+        { icon: 'https://via.placeholder.com/40/ff0000/ffffff?text=HOT', title: 'Khuyến mãi đặc biệt!', description: 'Giảm giá lên đến 50% cho tất cả các mặt hàng gia dụng. Đừng bỏ lỡ!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/e0e0e0/000000?text=APP', title: 'Tải ngay ứng dụng mới!', description: 'Trải nghiệm mua sắm mượt mà hơn với ứng dụng mới của chúng tôi.', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/c0c0c0/000000?text=CODE', title: 'Khóa học trực tuyến miễn phí', description: 'Đăng ký ngay để nhận khóa học lập trình cơ bản miễn phí.', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/ffcc00/000000?text=WIN', title: 'Trúng iPhone 15 Pro Max', description: 'Bạn là người may mắn thứ 999. Nhấn vào để nhận thưởng ngay!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/00ff00/ffffff?text=VAY', title: 'Vay Tiền Không Thế Chấp', description: 'Giải ngân trong 5 phút. Lãi suất 0% cho lần vay đầu tiên!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/0000ff/ffffff?text=JOB', title: 'Việc Nhẹ Lương Cao', description: 'Chỉ cần xem video TikTok ngày kiếm 500K. Không thu phí đầu vào!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/ff00ff/ffffff?text=RICH', title: 'Khóa Học Làm Giàu', description: 'Cách kiếm 1 tỷ đầu tiên ở tuổi 18. Bí kíp từ chuyên gia tài chính!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/800080/ffffff?text=GAME', title: 'Game Nổ Hũ Siêu Tốc', description: 'Đăng ký nhận ngay code 100K trải nghiệm. Tỉ lệ nổ hũ cực cao!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/00ffff/000000?text=SPY', title: 'App Theo Dõi Tin Nhắn', description: 'Xem trộm tin nhắn Zalo, Messenger của người yêu không bị phát hiện!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/ffa500/ffffff?text=BIP', title: 'Nhóm Kéo Tài Xỉu Đỉnh Cao', description: 'Nhóm kéo uy tín 100%, bảo hiểm vốn. Link vào nhóm bên dưới!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/808080/ffffff?text=WIFI', title: 'Hack Pass Wifi Hàng Xóm', description: 'Phần mềm hiển thị mật khẩu wifi xung quanh bạn. Cài đặt miễn phí!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/008000/ffffff?text=DIET', title: 'Giảm 10kg Trong 1 Tuần', description: 'Thuốc giảm cân thần tốc không cần ăn kiêng. An toàn tuyệt đối!', link: 'https://youtu.be/dQw4w9WgXcQ' },
+        { icon: 'https://via.placeholder.com/40/ff4500/ffffff?text=SALE', title: 'Xả Kho Bàn Phím Cơ', description: 'Bàn phím cơ gõ siêu sướng giá chỉ từ 99K. Số lượng có hạn!', link: 'https://youtu.be/dQw4w9WgXcQ' }
     ];
 
     function showPopup(data, position) {
         if (!adsOn) return;
         const popupContent = template.content.cloneNode(true);
         const popup = popupContent.querySelector('.popup-notification');
-        
         popup.querySelector('.popup-icon').src = data.icon;
         popup.querySelector('.popup-title').textContent = data.title;
         popup.querySelector('.popup-description').textContent = data.description;
         popup.querySelector('.popup-cta-button').href = data.link;
-        
         container.classList.remove('left', 'right');
         container.classList.add(position);
         container.appendChild(popup);
-        
         setTimeout(() => {
             popup.classList.add('is-visible');
         }, 100);
-        
         const closeButton = popup.querySelector('.popup-close-button');
         closeButton.addEventListener('click', () => {
             popup.classList.remove('is-visible');
@@ -537,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const randomAd = adData[Math.floor(Math.random() * adData.length)];
         const randomPosition = Math.random() < 0.5 ? 'left' : 'right';
         showPopup(randomAd, randomPosition);
-    }, 10000);
+    }, 6000);
 });
 </script>
 </body>
