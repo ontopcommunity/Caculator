@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Máy Tính Siêu Cấp</title>
+<style>
+:root {
+    --popup-bg-color: #ffffff;
+    --popup-text-color: #333333;
+    --popup-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --popup-border-radius: 12px;
+    --popup-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+/* Sửa lại body để luôn chiếm trọn 100% màn hình */
+body {
+    background-color: #0b1120;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+/* Wrapper bọc lấy toàn bộ và canh giữa tuyệt đối */
+#calc-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.calc-container {
+    background-color: #172033;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 320px;
+    z-index: 50;
+    transform-origin: center center;
+    transition: transform 0.15s ease-out;
+    position: relative;
+}
+.display {
+    background-color: #172033;
+    color: #38bdf8;
+    font-size: 2.5rem;
+    text-align: right;
+    padding: 20px 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    min-height: 40px;
+    word-wrap: break-word;
+}
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.btn {
+    background-color: #1e293b;
+    border: none;
+    color: #e2e8f0;
+    font-size: 1.2rem;
+    padding: 20px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s, opacity 0.2s;
+}
+.btn:active {
+    transform: scale(0.95);
+}
+.text-red { color: #f87171; }
+.text-green { color: #34d399; }
+
+.calc-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+.action-btn {
+    background-color: #1e293b;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+#btn-shop {
+    border: 2px solid #eab308;
+    color: #eab308;
+}
+#btn-shop:hover {
+    background: #eab308;
+    color: #0b1120;
+}
+#btn-contact {
+    border: 2px solid #ef4444;
+    color: #ef4444;
+}
+#btn-contact:hover {
+    background: #ef4444;
+    color: #0b1120;
+}
+
+.menu-panel {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid #38bdf8;
+    border-radius: 10px;
+    padding: 15px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+.menu-panel.active {
+    display: flex;
+}
+.pkg-btn, .panel-link {
+    background: #1e293b;
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+    display: block;
+}
+.pkg-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: #64748b;
+    color: #64748b;
+}
+.pkg-btn:not(:disabled):hover, .panel-link:hover {
+    background: #38bdf8;
+    color: #0b1120;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+#popup-notification-container {
+    position: fixed;
+    top: 20px;
+    width: 350px;
+    z-index: 10000;
+}
+#popup-notification-container.left { left: 20px; }
+#popup-notification-container.right { right: 20px; }
+.popup-notification {
+    background-color: var(--popup-bg-color);
+    color: var(--popup-text-color);
+    border-radius: var(--popup-border-radius);
+    box-shadow: var(--popup-shadow);
+    padding: 16px;
+    margin-bottom: 12px;
+    font-family: var(--popup-font-family);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    overflow: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateY(-20px);
+    opacity: 0;
+}
+.popup-notification.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+.popup-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+.popup-content { flex-grow: 1; }
+.popup-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.popup-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+.popup-description {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.popup-cta-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.popup-cta-button:hover { background-color: #0056b3; }
+.popup-close-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.popup-close-button:hover { color: #333; }
+</style>
+</head>
+<body>
+<div id="calc-wrapper">
+    <div class="calc-container" id="calc-container">
+        <div class="display" id="display">0</div>
+        <div class="keypad" id="keypad">
+            <button class="btn text-red" data-val="C">C</button>
+            <button class="btn text-red" data-val="DEL">⌫</button>
+            <button class="btn text-green" data-val="/">/</button>
+            <button class="btn text-green" data-val="*">*</button>
+            <button class="btn" data-val="7">7</button>
+            <button class="btn" data-val="8">8</button>
+            <button class="btn" data-val="9">9</button>
+            <button class="btn text-green" data-val="-">-</button>
+            <button class="btn" data-val="4">4</button>
+            <button class="btn" data-val="5">5</button>
+            <button class="btn" data-val="6">6</button>
+            <button class="btn text-green" data-val="+">+</button>
+            <button class="btn" data-val="1">1</button>
+            <button class="btn" data-val="2">2</button>
+            <button class="btn" data-val="3">3</button>
+            <button class="btn text-green" data-val="=">=</button>
+            <button class="btn" data-val="0">0</button>
+            <button class="btn" data-val="00">00</button>
+            <button class="btn" data-val=".">.</button>
+        </div>
+        
+        <div class="calc-footer">
+            <button id="btn-shop" class="action-btn">Shop</button>
+            <button id="btn-contact" class="action-btn">Contact</button>
+        </div>
+
+        <div id="shop-panel" class="menu-panel">
+            <button id="pkg-noads" disabled class="pkg-btn" data-name="No ads (2$)">No ads (2$)</button>
+            <button id="pkg-acc" disabled class="pkg-btn" data-name="Tính đúng 100% (5$)">Tính đúng 100% (5$)</button>
+            <button id="pkg-nomiss" disabled class="pkg-btn" data-name="Không mất nút (15$)">Không mất nút (15$)</button>
+            <button id="pkg-nojump" disabled class="pkg-btn" data-name="Không nhảy nút (20$)">Không nhảy nút (20$)</button>
+            <button id="pkg-combo" disabled class="pkg-btn" data-name="Combo All (45$)">Combo All (45$)</button>
+        </div>
+
+        <div id="contact-panel" class="menu-panel">
+            <a href="https://t.me/ontop2k9" target="_blank" class="panel-link">Telegram: @ontop2k9</a>
+            <a href="https://facebook.com/minh21092k9" target="_blank" class="panel-link">FB: minh21092k9</a>
+            <a href="https://tiktok.com/@ontopcommunity" target="_blank" class="panel-link">TikTok: @ontopcommunity</a>
+        </div>
+    </div>
+</div>
+
+<div id="popup-notification-container"></div>
+<template id="popup-template">
+    <div class="popup-notification">
+        <div class="popup-content">
+            <div class="popup-header">
+                <img src="" alt="Icon" class="popup-icon" />
+                <h4 class="popup-title"></h4>
+            </div>
+            <p class="popup-description"></p>
+            <a href="#" target="_blank" class="popup-cta-button">Xem ngay</a>
+        </div>
+        <button class="popup-close-button" aria-label="Đóng">&times;</button>
+    </div>
+</template>
+
+<script>
+function updateCalcScale() {
+    const calc = document.getElementById('calc-container');
+    if (!calc) return;
+    
+    // Đã chuyển sang lấy kích thước trực tiếp từ window để đảm bảo độ chính xác 100%
+    const baseWidth = 360; 
+    const baseHeight = 620; 
+    const availableWidth = window.innerWidth;
+    const availableHeight = window.innerHeight;
+    
+    // Trừ hao 5% để không sát viền quá
+    const scale = Math.min(availableWidth / baseWidth, availableHeight / baseHeight) * 0.95;
+    
+    calc.style.transform = `scale(${Math.max(0.3, scale)})`;
+}
+
+window.addEventListener('resize', updateCalcScale);
+// Đảm bảo chạy lại lúc tải xong trang
+document.addEventListener('DOMContentLoaded', updateCalcScale);
+window.onload = updateCalcScale;
+
+const btnShop = document.getElementById('btn-shop');
+const btnContact = document.getElementById('btn-contact');
+const shopPanel = document.getElementById('shop-panel');
+const contactPanel = document.getElementById('contact-panel');
+
+btnShop.onclick = () => {
+    shopPanel.classList.toggle('active');
+    contactPanel.classList.remove('active');
+};
+
+btnContact.onclick = () => {
+    contactPanel.classList.toggle('active');
+    shopPanel.classList.remove('active');
+};
+
+let adsOn = true;
+let accurate = false;
+let jumping = true;
+let missing = true;
+
+const pkgs = [
+    { id: 'pkg-noads', time: 60 },
+    { id: 'pkg-acc', time: 60 },
+    { id: 'pkg-nomiss', time: 60 },
+    { id: 'pkg-nojump', time: 60 },
+    { id: 'pkg-combo', time: 180 }
+];
+
+const shuffled = pkgs.sort(() => 0.5 - Math.random());
+const selected = shuffled.slice(0, 2);
+
+selected.forEach(pkg => {
+    const btn = document.getElementById(pkg.id);
+    const name = btn.getAttribute('data-name');
+    let timeLeft = pkg.time;
+    
+    btn.innerText = `${timeLeft}s`;
+    
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            btn.innerText = name;
+            btn.disabled = false;
+        } else {
+            btn.innerText = `${timeLeft}s`;
+        }
+    }, 1000);
+});
+
+document.getElementById('pkg-noads').onclick = function() {
+    adsOn = false;
+    document.getElementById('popup-notification-container').innerHTML = '';
+    this.style.background = '#38bdf8';
+    this.style.color = '#0b1120';
+};
+document.getElementById('pkg-acc').onclick = function() {
+    accurate = true;
+    this.style.background = '#38bdf8';
+    this.style.color = '#0b1120';
+};
+document.getElementById('pkg-nomiss').onclick = function() {
+    missing = false;
+    restoreButtons();
+    this.style.background = '#38bdf8';
+    this.style.color = '#0b1120';
+};
+document.getElementById('pkg-nojump').onclick = function() {
+    jumping = false;
+    this.style.background = '#38bdf8';
+    this.style.color = '#0b1120';
+};
+document.getElementById('pkg-combo').onclick = function() {
+    adsOn = false;
+    accurate = true;
+    jumping = false;
+    missing = false;
+    document.getElementById('popup-notification-container').innerHTML = '';
+    restoreButtons();
+    this.style.background = '#38bdf8';
+    this.style.color = '#0b1120';
+};
+
+const display = document.getElementById('display');
+const keypad = document.getElementById('keypad');
+const buttons = Array.from(document.querySelectorAll('.btn'));
+let expr = '';
+
+function restoreButtons() {
+    buttons.forEach(b => {
+        b.style.opacity = '1';
+        b.innerHTML = b.dataset.val;
+    });
+}
+
+function randomize() {
+    if (jumping) {
+        for (let i = keypad.children.length; i >= 0; i--) {
+            keypad.appendChild(keypad.children[Math.random() * i | 0]);
+        }
+    }
+    if (missing) {
+        buttons.forEach(b => {
+            b.style.opacity = Math.random() < 0.1 ? '0' : '1';
+            b.innerHTML = Math.random() < 0.15 ? '' : b.dataset.val;
+        });
+    }
+}
+
+async function calculateApi(expression) {
+    if (accurate) {
+        try {
+            display.innerText = "Đang tính...";
+            let safeExpr = expression.replace(/\+/g, '%2B').replace(/\//g, '%2F');
+            let response = await fetch('https://api.mathjs.org/v4/?expr=' + safeExpr);
+            let resultText = await response.text();
+            display.innerText = resultText;
+            expr = resultText;
+        } catch (e) {
+            display.innerText = 'Lỗi API';
+        }
+    } else {
+        try {
+            let res = eval(expression);
+            res = String(res) + Math.floor(Math.random() * 9);
+            display.innerText = res;
+            expr = String(res);
+        } catch {
+            display.innerText = 'Error';
+        }
+    }
+}
+
+buttons.forEach(btn => {
+    btn.onclick = () => {
+        if (Math.random() < 0.10) {
+            window.location.href = "https://youtu.be/dQw4w9WgXcQ";
+            return; 
+        }
+
+        randomize();
+        let val = btn.dataset.val;
+        if (val === 'C') {
+            expr = '';
+            display.innerText = '0';
+        } else if (val === 'DEL') {
+            expr = expr.slice(0, -1);
+            display.innerText = expr || '0';
+        } else if (val === '=') {
+            calculateApi(expr);
+        } else {
+            expr += val;
+            display.innerText = expr;
+        }
+    };
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('popup-notification-container');
+    const template = document.getElementById('popup-template');
+    const adData = [
+        {
+            icon: 'https://via.placeholder.com/40',
+            title: 'Khuyến mãi đặc biệt!',
+            description: 'Giảm giá lên đến 50% cho tất cả các mặt hàng gia dụng. Đừng bỏ lỡ!',
+            link: '#'
+        },
+        {
+            icon: 'https://via.placeholder.com/40/e0e0e0',
+            title: 'Tải ngay ứng dụng mới!',
+            description: 'Trải nghiệm mua sắm mượt mà hơn với ứng dụng mới của chúng tôi.',
+            link: '#'
+        },
+        {
+            icon: 'https://via.placeholder.com/40/c0c0c0',
+            title: 'Khóa học trực tuyến miễn phí',
+            description: 'Đăng ký ngay để nhận khóa học lập trình cơ bản miễn phí.',
+            link: '#'
+        }
+    ];
+
+    function showPopup(data, position) {
+        if (!adsOn) return;
+        const popupContent = template.content.cloneNode(true);
+        const popup = popupContent.querySelector('.popup-notification');
+        
+        popup.querySelector('.popup-icon').src = data.icon;
+        popup.querySelector('.popup-title').textContent = data.title;
+        popup.querySelector('.popup-description').textContent = data.description;
+        popup.querySelector('.popup-cta-button').href = data.link;
+        
+        container.classList.remove('left', 'right');
+        container.classList.add(position);
+        container.appendChild(popup);
+        
+        setTimeout(() => {
+            popup.classList.add('is-visible');
+        }, 100);
+        
+        const closeButton = popup.querySelector('.popup-close-button');
+        closeButton.addEventListener('click', () => {
+            popup.classList.remove('is-visible');
+            setTimeout(() => {
+                popup.remove();
+            }, 300);
+        });
+    }
+
+    setInterval(() => {
+        if (!adsOn) return;
+        const randomAd = adData[Math.floor(Math.random() * adData.length)];
+        const randomPosition = Math.random() < 0.5 ? 'left' : 'right';
+        showPopup(randomAd, randomPosition);
+    }, 10000);
+});
+</script>
+</body>
+</html>
+
